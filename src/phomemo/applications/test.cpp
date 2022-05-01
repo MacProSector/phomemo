@@ -21,7 +21,8 @@ main()
 
     printer->connect(device);
 
-    logger->logDebug("Connected: " + std::to_string(printer->connected()));
+    logger->logInfo("Connected: " + std::to_string(printer->connected()));
+    logger->logInfo("Serial Number: " + std::to_string(printer->getSerialNumber()));
 
     return 0;
 }

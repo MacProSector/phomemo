@@ -22,6 +22,9 @@ public:
 
 	Printer(std::shared_ptr<Logger> logger);
 
+	int
+	getSerialNumber();
+
 	void
 	connect(const std::string& device);
 
@@ -35,6 +38,6 @@ private:
 	boost::asio::io_service io_service_;
 	boost::asio::serial_port serial_port_;
 };
-}	// namespace tumbller
+}	// namespace phomemo
 
 #endif	// PRINTER_PRINTER_H_

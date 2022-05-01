@@ -5,17 +5,52 @@
  *      Author: simonyu
  */
 
+#include <array>
+#include <boost/asio/buffer.hpp>
+
 #include "utility/logger.h"
 #include "common/platform.h"
 #include "printer/printer.h"
 
-phomemo::Printer::Printer(std::shared_ptr<Logger> logger) : logger_(logger),
-        serial_port_(io_service_)
+namespace phomemo
+{
+Printer::Printer(std::shared_ptr<Logger> logger) : logger_(logger), serial_port_(io_service_)
 {
 }
 
+int
+Printer::getSerialNumber()
+{
+    const unsigned char request[3] = {ESCPOSCommand::US, 0x11, 0x13};
+    unsigned char response[3];
+
+    try
+    {
+        const auto bytes_written = serial_port_.write_some(
+                boost::asio::const_buffer(request, sizeof(request)));
+        logger_->logDebug("Bytes written: " + std::to_string(bytes_written));
+    }
+    catch (const boost::system::system_error &error)
+    {
+        logger_->logError(error.code().message());
+    }
+
+    try
+    {
+        const auto bytes_read = serial_port_.read_some(
+                boost::asio::mutable_buffer(response, sizeof(response)));
+        logger_->logDebug("Bytes read: " + std::to_string(bytes_read));
+    }
+    catch (const boost::system::system_error &error)
+    {
+        logger_->logError(error.code().message());
+    }
+
+    return static_cast<int>(response[2]);
+}
+
 void
-phomemo::Printer::connect(const std::string& device)
+Printer::connect(const std::string& device)
 {
     try
     {
@@ -40,7 +75,8 @@ phomemo::Printer::connect(const std::string& device)
 }
 
 bool
-phomemo::Printer::connected()
+Printer::connected()
 {
     return serial_port_.is_open();
 }
+}   // namespace phomemo
