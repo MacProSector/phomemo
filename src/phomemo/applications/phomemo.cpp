@@ -1,9 +1,22 @@
-#include <iostream>
+/*
+ * phomemo.cpp
+ *
+ *  Created on: May 1, 2022
+ *      Author: simonyu
+ */
+
+#include <memory>
+
+#include "utility/logger.h"
+
+using namespace phomemo;
 
 int
 main()
 {
-	std::cout << "Hello world!" << std::endl;
+    std::shared_ptr<Logger> logger = std::make_shared<Logger>();
 
-	return 0;
+    logger->logInfo("Hello world");
+
+    return 0;
 }
