@@ -15,6 +15,6 @@ apt install build-essential cmake
 With the above packages installed, set up the project as follows:
 
 ```bash
-cd scripts
+cd scripts/phomemo
 ./setup.bash
 ```
