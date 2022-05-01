@@ -47,5 +47,6 @@ include_directories(
 
 # Add subdirectories
 add_subdirectory(applications)
+add_subdirectory(communication)
 add_subdirectory(printer)
 add_subdirectory(utility)

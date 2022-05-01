@@ -49,7 +49,7 @@ enum ESCPOSCommand : int
     US = 0x1F	//!< Unit separator.
 };
 
-enum Serial : int
+enum SerialOption : int
 {
     baud_rate = 9600,   //!< Baud rate.
     character_size = 8  //!< Character size.

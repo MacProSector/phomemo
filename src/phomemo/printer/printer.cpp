@@ -6,77 +6,59 @@
  */
 
 #include <array>
-#include <boost/asio/buffer.hpp>
 
+#include "communication/communication.h"
 #include "utility/logger.h"
 #include "common/platform.h"
 #include "printer/printer.h"
 
 namespace phomemo
 {
-Printer::Printer(std::shared_ptr<Logger> logger) : logger_(logger), serial_port_(io_service_)
+Printer::Printer(std::shared_ptr<Logger> logger, std::shared_ptr<Communication> communication) :
+        logger_(logger), communication_(communication)
 {
 }
 
-int
+std::string
 Printer::getSerialNumber()
 {
-    const unsigned char request[3] = {ESCPOSCommand::US, 0x11, 0x13};
-    unsigned char response[3];
-
-    try
+    if (!communication_->is_open())
     {
-        const auto bytes_written = serial_port_.write_some(
-                boost::asio::const_buffer(request, sizeof(request)));
-        logger_->logDebug("Bytes written: " + std::to_string(bytes_written));
-    }
-    catch (const boost::system::system_error &error)
-    {
-        logger_->logError(error.code().message());
+        logger_->logError("Communication unavailable");
+        return std::string();
     }
 
-    try
-    {
-        const auto bytes_read = serial_port_.read_some(
-                boost::asio::mutable_buffer(response, sizeof(response)));
-        logger_->logDebug("Bytes read: " + std::to_string(bytes_read));
-    }
-    catch (const boost::system::system_error &error)
-    {
-        logger_->logError(error.code().message());
-    }
+    const std::array<unsigned char, 3> request = {ESCPOSCommand::US, 0x11, 0x13};
+    std::array<unsigned char, 3> response;
 
-    return static_cast<int>(response[2]);
+    communication_->write(request.data(), request.size());
+    communication_->read(response.data(), response.size());
+
+    return std::to_string(static_cast<int>(response[2]));
 }
 
-void
-Printer::connect(const std::string& device)
+std::string
+Printer::getFirmwareVersion()
 {
-    try
+    if (!communication_->is_open())
     {
-        serial_port_.open(device);
-
-        boost::asio::serial_port_base::baud_rate baud_rate(Serial::baud_rate);
-        boost::asio::serial_port_base::character_size character_size(Serial::character_size);
-        boost::asio::serial_port_base::parity parity(
-                boost::asio::serial_port_base::parity::type::none);
-        boost::asio::serial_port_base::stop_bits stop_bits(
-                boost::asio::serial_port_base::stop_bits::type::one);
-
-        serial_port_.set_option(baud_rate);
-        serial_port_.set_option(character_size);
-        serial_port_.set_option(parity);
-        serial_port_.set_option(stop_bits);
+        logger_->logError("Communication unavailable");
+        return std::string();
     }
-    catch (const boost::system::system_error &error)
-    {
-        logger_->logError(error.code().message());
-    }
-}
 
-bool
-Printer::connected()
-{
-    return serial_port_.is_open();
+    const std::array<unsigned char, 3> request = {ESCPOSCommand::US, 0x11, 0x07};
+    std::array<unsigned char, 5> response;
+    std::string firmware_version = "";
+
+    communication_->write(request.data(), request.size());
+    communication_->read(response.data(), response.size());
+
+    firmware_version += std::to_string(static_cast<int>(response[4]));
+    firmware_version += ".";
+    firmware_version += std::to_string(static_cast<int>(response[3]));
+    firmware_version += ".";
+    firmware_version += std::to_string(static_cast<int>(response[2]));
+
+    return firmware_version;
 }
 }   // namespace phomemo

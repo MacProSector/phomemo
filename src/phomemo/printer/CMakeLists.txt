@@ -16,8 +16,8 @@ set_target_properties(
 # Set library link targets
 target_link_libraries(
 	phomemo_printer
+	phomemo_communication
 	phomemo_utility
-	${Boost_LIBRARIES}
 )
 
 # Set installation targets

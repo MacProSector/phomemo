@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "communication/serial.h"
 #include "utility/logger.h"
 #include "printer/printer.h"
 
@@ -17,12 +18,19 @@ main()
 {
     const std::string device = "/dev/tty.usbmodem14102";
     std::shared_ptr<Logger> logger = std::make_shared<Logger>();
-    std::shared_ptr<Printer> printer = std::make_shared<Printer>(logger);
+    std::shared_ptr<Serial> communication = std::make_shared<Serial>(logger);
+    std::shared_ptr<Printer> printer = std::make_shared<Printer>(logger, communication);
 
-    printer->connect(device);
+    communication->open(device);
 
-    logger->logInfo("Connected: " + std::to_string(printer->connected()));
-    logger->logInfo("Serial Number: " + std::to_string(printer->getSerialNumber()));
+    if (!communication->is_open())
+    {
+        logger->logError("Communication unavailable");
+        return 1;
+    }
+
+    logger->logInfo("Serial Number: " + printer->getSerialNumber());
+    logger->logInfo("Firmware Version: " + printer->getFirmwareVersion());
 
     return 0;
 }

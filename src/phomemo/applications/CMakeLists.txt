@@ -11,6 +11,7 @@ add_executable(
 # Set library link targets
 target_link_libraries(
 	phomemo
+	phomemo_communication
 	phomemo_printer
 	phomemo_utility
 	${Boost_LIBRARIES}
@@ -19,6 +20,7 @@ target_link_libraries(
 # Set library link targets
 target_link_libraries(
 	test
+	phomemo_communication
 	phomemo_printer
 	phomemo_utility
 	${Boost_LIBRARIES}
