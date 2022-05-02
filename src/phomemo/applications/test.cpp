@@ -29,8 +29,14 @@ main()
         return 1;
     }
 
-    logger->logInfo("Serial Number: " + printer->getSerialNumber());
+    printer->initialize();
+    printer->reset();
+    printer->setJustification(Justification::left);
+
+    logger->logInfo("Battery Level: " + printer->getBatteryLevel());
     logger->logInfo("Firmware Version: " + printer->getFirmwareVersion());
+    logger->logInfo("Paper Level: " + printer->getPaperLevel());
+    logger->logInfo("Serial Number: " + printer->getSerialNumber());
 
     return 0;
 }

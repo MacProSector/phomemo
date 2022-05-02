@@ -10,11 +10,19 @@
 
 #include <string>
 
+#include "common/printing.h"
+
 namespace phomemo
 {
 class Communication;
 class Logger;
 
+/*
+ *  https://github.com/theacodes/phomemo_m02s
+ *  https://github.com/hkeward/phomemo_printer
+ *  https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=2
+ *  https://escpos.readthedocs.io/en/latest/
+ */
 class Printer
 {
 public:
@@ -22,10 +30,28 @@ public:
     Printer(std::shared_ptr<Logger> logger, std::shared_ptr<Communication> communication);
 
     std::string
-    getSerialNumber();
+    getBatteryLevel();
 
     std::string
     getFirmwareVersion();
+
+    std::string
+    getPaperLevel();
+
+    std::string
+    getSerialNumber();
+
+    void
+    setJustification(const Justification& justification);
+
+    void
+    initialize();
+
+    void
+    reset();
+
+    void
+    printLineFeed();
 
 private:
 
